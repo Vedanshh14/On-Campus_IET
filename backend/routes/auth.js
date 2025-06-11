@@ -101,7 +101,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-module.exports = router;
+
 
 //RESET PASSWORD AS ADMIN FOR SOMEONE FROM POSTMAN
 // POST /reset-password
@@ -127,3 +127,5 @@ router.post('/reset-pass-admin', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+module.exports = router;

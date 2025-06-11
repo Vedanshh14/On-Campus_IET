@@ -25,18 +25,21 @@ mongoose.connect(process.env.MONGO_URI)
 // ----------------
 // 📁 Route Imports
 // ----------------
-const authRoutes = require('./routes/auth');
-app.use('/api/auth', authRoutes)
-
-// ------------------
-// 🚪 API Route Setup
-// ------------------
-app.use('/api/auth', authRoutes); // All auth routes go through this prefix
 
 // Basic Health Check Route
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
+
+//signup,login,password reset routes
+const authRoutes = require('./routes/auth');
+app.use('/api/auth', authRoutes)
+
+//post, delete or update a blog
+const blogRoutes = require('./routes/blog');
+app.use('/api/blog', blogRoutes);
+
+
 
 // ---------------------
 // 🚀 Start the Backend

@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
   contact: { type: String },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  blogsWritten: {type: Number, default: 0}
   
 }, { timestamps: true });
 
