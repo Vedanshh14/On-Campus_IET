@@ -6,11 +6,73 @@ const express = require('express');
 const Blog = require('../models/blog');
 const User = require('../models/user');
 const protect = require('../middleware/authMiddleware');
+const Company = require('../models/company'); 
 
 const router = express.Router();
 
-//GET /blog/all
-//returns all blogs in DB
+
+// GET /blogs/filter
+router.get('/filter', async (req, res) => {
+  try {
+    const {
+      companyName,
+      campusType,
+      arrivedInSem,
+      cgpaCriteria,
+      selectionStatus,
+      packageMin,
+      packageMax,
+      
+    } = req.query;
+
+    const filter = {};
+
+    if (companyName) filter.companyName = companyName;
+    if (campusType) filter.campusType = campusType;
+    if (arrivedInSem) filter.arrivedInSem = Number(arrivedInSem);
+    if (cgpaCriteria) {
+     filter.cgpaCriteria = { $gte: Number(cgpaCriteria) };
+}
+    if (selectionStatus) filter.selectionStatus = selectionStatus;
+
+    // Full time Package Range Filtering
+    //intern package not considered here.
+    //tell user to always enter in LPA .eg 6.25 LPA will also work
+
+    if (packageMin && packageMax) {
+      filter.packageFullTime = {
+        $gte: Number(packageMin),
+        $lte: Number(packageMax)
+      };
+    }
+
+  const page = parseInt(req.query.page) || 1;
+const limit = parseInt(req.query.limit) || 10;
+const skip = (page - 1) * limit;
+
+    const blogs = await Blog.find(filter)
+      .sort({ createdAt: -1 }) // newest first
+      .skip(skip)
+      .limit(parseInt(limit))
+      .populate('user', '-password -__v');
+      //every blog is populated with all users details who wrote it
+
+    const total = await Blog.countDocuments(filter);
+
+    res.status(200).json({
+      message: 'Filtered blogs fetched successfully',
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(total / limit),
+      totalBlogs: total,
+      blogs,
+    });
+  } catch (error) {
+    console.error('Filter Fetch Error:', error);
+    res.status(500).json({ message: 'Server error while fetching blogs' });
+  }
+});
+
+module.exports = router;
 
 // POST /blog/add
 router.post('/add', protect, async (req, res) => {
@@ -29,6 +91,16 @@ router.post('/add', protect, async (req, res) => {
   } = req.body;
 
   try {
+     
+     // Check if company already exists
+    let existingCompany = await Company.findOne({ name: companyName });
+
+    // If not, add new company to DB
+    if (!existingCompany) {
+      existingCompany = new Company({ name: companyName });
+      await existingCompany.save();
+    }
+
     const blog = new Blog({
       user: req.user._id,
       postAsAnonymous,

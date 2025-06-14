@@ -1,3 +1,4 @@
+const { response } = require('express');
 const mongoose = require('mongoose');
 
 const blogSchema = new mongoose.Schema({
@@ -27,8 +28,14 @@ const blogSchema = new mongoose.Schema({
     type: Number,
     enum: [5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9]
   },
-  packageIntern: String,
-  packageFullTime: String,
+  packageIntern: {
+  type: Number
+  //get form frontend as per month
+  },
+  packageFullTime: {
+  type: Number
+  //get from frontend as per year.
+  },
   selectionStatus: {
     type: String,
     enum: ['selected', 'notselected'],
