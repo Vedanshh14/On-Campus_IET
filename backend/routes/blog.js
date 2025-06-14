@@ -1,5 +1,5 @@
 // routes/blog.js
-//add,delete
+//fetch by filters,add,delete,upvote,update
 
 
 const express = require('express');
@@ -158,6 +158,42 @@ router.delete('/:id', protect, async (req, res) => {
   } catch (error) {
     console.error('Delete Blog Error:', error);
     res.status(500).json({ message: 'Server error while deleting blog' });
+  }
+});
+
+//......................................................
+
+// POST /blog/:id/upvote
+// POST /api/blog/<blog_id>/upvote
+router.post('/:id/upvote', protect, async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+    //while testing i found incorrect blog id sends u to
+    //catch block(500) and doesnt return 404 of below line
+
+    if (!blog) return res.status(404).json({ message: 'Blog not found' });
+    //if u see in blog schema, upvote actualy is an array of userids
+    //which stores which user has upvoted a given block.
+    const userId = req.user._id;
+
+    const alreadyUpvoted = blog.upvotes.includes(userId);
+
+    if (alreadyUpvoted) {
+      blog.upvotes.pull(userId); // remove upvote
+    } else {
+      blog.upvotes.push(userId); // add upvote
+    }
+
+    await blog.save();
+
+    res.status(200).json({
+      message: alreadyUpvoted ? 'Upvote removed' : 'Upvoted successfully',
+      totalUpvotes: blog.upvotes.length,
+      userHasUpvoted: !alreadyUpvoted
+    });
+  } catch (error) {
+    console.error('Upvote Error:', error);
+    res.status(500).json({ message: 'Server error while toggling upvote' });
   }
 });
 

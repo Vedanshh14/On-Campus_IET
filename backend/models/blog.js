@@ -44,7 +44,12 @@ const blogSchema = new mongoose.Schema({
   experience: {
     type: String,
     required: true
-  }
+  },
+  upvotes: {
+  type: [mongoose.Schema.Types.ObjectId], // array of user IDs
+  ref: 'User',
+  default: []
+}
 }, { timestamps: true });
 
 module.exports = mongoose.model('Blog', blogSchema);
