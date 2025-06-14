@@ -7,6 +7,7 @@ const Blog = require('../models/blog');
 const User = require('../models/user');
 const protect = require('../middleware/authMiddleware');
 const Company = require('../models/company'); 
+const mongoose = require('mongoose');
 
 const router = express.Router();
 
@@ -194,6 +195,59 @@ router.post('/:id/upvote', protect, async (req, res) => {
   } catch (error) {
     console.error('Upvote Error:', error);
     res.status(500).json({ message: 'Server error while toggling upvote' });
+  }
+});
+
+//..................................................
+//update route
+// PUT /api/blog/:id
+//can do delete previous blog and create new with updated changes
+//but will loose upvote count 
+//therefoore using put is better
+//see notion notes must for this
+
+router.put('/:id', protect, async (req, res) => {
+  try {
+    const blogId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(blogId)) {
+      return res.status(400).json({ message: 'Invalid blog ID' });
+    }
+
+    const blog = await Blog.findById(blogId);
+
+    if (!blog) {
+      return res.status(404).json({ message: 'Blog not found' });
+    }
+
+    if (blog.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized to update this blog' });
+    }
+
+    const allowedFields = [
+      'postAsAnonymous',
+      'companyName',
+      'campusType',
+      'arrivedInSem',
+      'cgpaCriteria',
+      'packageIntern',
+      'packageFullTime',
+      'selectionStatus',
+      'experience'
+    ];
+
+    allowedFields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        blog[field] = req.body[field];
+      }
+    });
+
+    await blog.save();
+
+    res.status(200).json({ message: 'Blog updated successfully', blog });
+  } catch (error) {
+    console.error('Update Blog Error:', error);
+    res.status(500).json({ message: 'Server error while updating blog' });
   }
 });
 
