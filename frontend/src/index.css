@@ -1,0 +1,8 @@
+/* index.css */
+@import "tailwindcss";
+
+body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+}
