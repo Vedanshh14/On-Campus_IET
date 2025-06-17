@@ -7,7 +7,7 @@ const express = require('express');
 const Blog = require('../models/blog');
 const User = require('../models/user');
 const protect = require('../middleware/authMiddleware');
-const Company = require('../models/company'); 
+// const Company = require('../models/company'); 
 const mongoose = require('mongoose');
 
 const router = express.Router();
@@ -33,7 +33,7 @@ router.get('/filter', async (req, res) => {
     if (campusType) filter.campusType = campusType;
     if (arrivedInSem) filter.arrivedInSem = Number(arrivedInSem);
     if (cgpaCriteria) {
-     filter.cgpaCriteria = { $gte: Number(cgpaCriteria) };
+     filter.cgpaCriteria = { $lte: Number(cgpaCriteria) };
 }
     if (selectionStatus) filter.selectionStatus = selectionStatus;
 

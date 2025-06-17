@@ -9,6 +9,11 @@ const cookieParser = require('cookie-parser');
 // Create app instance
 const app = express();
 
+//CORS setup
+//change after deployment as unsafe, for now allowing all clients
+const cors = require('cors');
+app.use(cors()); // Allows ALL origins (wildcard *)
+
 // -------------------
 // 🔧 Middleware Setup
 // -------------------
@@ -38,6 +43,9 @@ app.use('/api/auth', authRoutes)
 //post, delete or update a blog
 const blogRoutes = require('./routes/blog');
 app.use('/api/blog', blogRoutes);
+
+const companyRoutes = require('./routes/companies');
+app.use('/api/companies', companyRoutes)
 
 
 
