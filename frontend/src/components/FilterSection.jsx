@@ -1,54 +1,37 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
-//it is a react library to make api calls
 
-export default function FilterSection({ filters, setFilters, setBlogs }) {
+export default function FilterSection({ filters, setFilters, setPage, onApply }) {
   const [companies, setCompanies] = useState([]);
-  //   const [selectedCompany, setSelectedCompany] = useState("");
 
   useEffect(() => {
     axios
       .get(`${API_BASE}/api/companies/all`)
       .then((res) => {
-        // console.log(res.data.companies);
         setCompanies(res.data.companies);
       })
       .catch((err) => {
-        console.error("Error in fetching companies: ", err);
+        console.error("Error fetching companies: ", err);
       });
   }, []);
 
-  //when apply filters button pressed:
-  const onApply = async () => {
-    try {
-      // Build query string from non-empty filters
-      const query = Object.entries(filters)
-        // eslint-disable-next-line no-unused-vars
-        .filter(([_, value]) => value !== "")
-        .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
-        .join("&");
-
-      const res = await axios.get(`${API_BASE}/api/blog/filter?${query}`);
-      setBlogs(res.data.blogs);
-    } catch (err) {
-      console.error("Error fetching blogs:", err);
-    }
+  const handleApplyClick = () => {
+    setPage(1); // Reset to first page
+    onApply();  // Trigger blog fetch with current filters
   };
 
   return (
     <div className="p-4 grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 bg-white rounded shadow">
-      {/* Company */}
+      {/* Company Filter */}
       <div>
         <label className="block mb-1 font-medium">Company:</label>
         <select
           value={filters.companyName}
-          onChange={(e) =>
-            setFilters((prev) => ({ ...prev, companyName: e.target.value }))
-          }
+          onChange={(e) => setFilters((prev) => ({ ...prev, companyName: e.target.value }))}
           className="w-full p-2 border border-gray-300 rounded"
         >
-          <option value="">Select</option>
+          <option value="">All</option>
           {companies.map((company, index) => (
             <option key={index} value={company}>
               {company}
@@ -62,12 +45,10 @@ export default function FilterSection({ filters, setFilters, setBlogs }) {
         <label className="block mb-1 font-medium">Campus Type:</label>
         <select
           value={filters.campusType}
-          onChange={(e) =>
-            setFilters((prev) => ({ ...prev, campusType: e.target.value }))
-          }
+          onChange={(e) => setFilters((prev) => ({ ...prev, campusType: e.target.value }))}
           className="w-full p-2 border border-gray-300 rounded"
         >
-          <option value="">Select</option>
+          <option value="">Both</option>
           <option value="on-campus">On Campus</option>
           <option value="off-campus">Off Campus</option>
         </select>
@@ -78,12 +59,10 @@ export default function FilterSection({ filters, setFilters, setBlogs }) {
         <label className="block mb-1 font-medium">Semester:</label>
         <select
           value={filters.arrivedInSem}
-          onChange={(e) =>
-            setFilters((prev) => ({ ...prev, arrivedInSem: e.target.value }))
-          }
+          onChange={(e) => setFilters((prev) => ({ ...prev, arrivedInSem: e.target.value }))}
           className="w-full p-2 border border-gray-300 rounded"
         >
-          <option value="">Select</option>
+          <option value="">Any</option>
           {[4, 5, 6, 7, 8].map((sem) => (
             <option key={sem} value={sem}>
               {sem}
@@ -97,12 +76,10 @@ export default function FilterSection({ filters, setFilters, setBlogs }) {
         <label className="block mb-1 font-medium">CGPA Criteria:</label>
         <select
           value={filters.cgpaCriteria}
-          onChange={(e) =>
-            setFilters((prev) => ({ ...prev, cgpaCriteria: e.target.value }))
-          }
+          onChange={(e) => setFilters((prev) => ({ ...prev, cgpaCriteria: e.target.value }))}
           className="w-full p-2 border border-gray-300 rounded"
         >
-          <option value="">Select</option>
+          <option value="">Any</option>
           {[5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9].map((cgpa) => (
             <option key={cgpa} value={cgpa}>
               ≤ {cgpa}
@@ -116,12 +93,10 @@ export default function FilterSection({ filters, setFilters, setBlogs }) {
         <label className="block mb-1 font-medium">Min Package (LPA):</label>
         <select
           value={filters.packageFullTimeMin}
-          onChange={(e) =>
-            setFilters((prev) => ({
-              ...prev,
-              packageFullTimeMin: e.target.value,
-            }))
-          }
+          onChange={(e) => setFilters((prev) => ({
+            ...prev,
+            packageMin: e.target.value
+          }))}
           className="w-full p-2 border border-gray-300 rounded"
         >
           <option value="">Any</option>
@@ -138,9 +113,7 @@ export default function FilterSection({ filters, setFilters, setBlogs }) {
         <label className="block mb-1 font-medium">Selection Status:</label>
         <select
           value={filters.selectionStatus}
-          onChange={(e) =>
-            setFilters((prev) => ({ ...prev, selectionStatus: e.target.value }))
-          }
+          onChange={(e) => setFilters((prev) => ({ ...prev, selectionStatus: e.target.value }))}
           className="w-full p-2 border border-gray-300 rounded"
         >
           <option value="">Any</option>
@@ -148,11 +121,12 @@ export default function FilterSection({ filters, setFilters, setBlogs }) {
           <option value="notselected">Not Selected</option>
         </select>
       </div>
-      {/* Apply Filters Button */}
+
+      {/* Apply Filters */}
       <div className="col-span-full flex justify-end mt-4">
         <button
-          onClick={onApply}
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+          onClick={handleApplyClick}
+          className="px-4 py-2 cursor-pointer bg-green-600 text-white rounded hover:bg-green-700 transition"
         >
           Apply Filters
         </button>

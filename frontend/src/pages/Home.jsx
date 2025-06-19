@@ -1,8 +1,10 @@
-import { useState } from "react";
+/* eslint-disable no-unused-vars */
+import { useEffect, useState } from "react";
 import FilterSection from "../components/FilterSection";
-// import axios from 'axios';
-const API_BASE = import.meta.env.VITE_API_BASE_URL;
+import { Link } from "react-router-dom";
+import axios from "axios";
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 export default function Home() {
   const [showFilters, setShowFilters] = useState(false);
@@ -11,53 +13,130 @@ export default function Home() {
     campusType: "",
     arrivedInSem: "",
     cgpaCriteria: "",
-    packageFullTimeMin: "",
+    packageMin: "",
     selectionStatus: "",
   });
-  const [blogs, setBlogs] = useState([]);
 
+  const [blogs, setBlogs] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 5; // blogs per page,change to 15 later
+
+  const fetchBlogs = async () => {
+    try {
+      const query = Object.entries(filters)
+        .filter(([_, value]) => value !== "")
+        .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+        .join("&");
+
+      const res = await axios.get(
+        `${API_BASE}/api/blog/filter?page=${page}&limit=${limit}&${query}`
+      );
+      setBlogs(res.data.blogs);
+      setTotalPages(res.data.totalPages);
+    } catch (err) {
+      console.error("Error fetching blogs:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchBlogs();
+  }, [page]);
 
   return (
     <div className="px-4 py-4">
-      {/* Toggle Button */}
+      {/* Toggle Filter Button */}
       <button
-        className="mb-4 px-4 py-2 cursor-pointer bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        className="mb-4 px-4 py-2 cursor-pointer bg-black text-white rounded hover:bg-blue-700 transition"
         onClick={() => setShowFilters((prev) => !prev)}
       >
         {showFilters ? "Hide Filters" : "Show Filters"}
       </button>
 
       {/* Conditionally Render Filters */}
-      {showFilters && (<FilterSection
-          filters = {filters}
-          setFilters = {setFilters}
-          setBlogs = {setBlogs}
-      
-      />)}
+      {showFilters && (
+        <FilterSection
+          filters={filters}
+          setFilters={setFilters}
+          setPage={setPage}
+          onApply={fetchBlogs}
+        />
+      )}
 
-      {/* Placeholder: blog cards would go below */}
-       {/* {console.log(blogs)} */}
-       <div className="mt-6 space-y-4">
-  {blogs.length === 0 ? (
-    <p className="text-gray-500">No blogs found.</p>
-  ) : (
-    blogs.map((blog) => (
-      <div
-        key={blog._id}
-        className="border rounded p-4 shadow-sm bg-white"
-      >
-        <h3 className="text-lg font-semibold">
-          {blog.postAsAnonymous ? 'Anonymous' : blog.user.name}
-        </h3>
-        <p className="text-sm text-gray-500">
-          {blog.companyName} • {blog.campusType} • {blog.arrivedInSem && `Sem ${blog.arrivedInSem}`}
-        </p>
-        <p className="mt-2 text-gray-700">{blog.experience}</p>
+      {/* Blog List */}
+
+      <div className="mt-6 space-y-4">
+        {blogs.length === 0 ? (
+          <p className="text-gray-500">
+            Sorry, no experience for applied filters.
+          </p>
+        ) : (
+          blogs.map((blog) => (
+            <Link to={`/blog/${blog._id}`} key={blog._id}>
+              <div
+                key={blog._id}
+                className="border-b-zinc-600 rounded mt-6 p-4 shadow-sm bg-white"
+              >
+                <h3 className="text-lg font-semibold">{blog.companyName}</h3>
+                <p className="text-sm text-gray-500">
+                  <span className="text-green-600">
+                    {blog.packageFullTime / 100000} LPA
+                  </span>{" "}
+                  • {blog.campusType} •{" "}
+                  {blog.arrivedInSem && `Sem ${blog.arrivedInSem}`}
+                </p>
+                <span className="text-sm text-gray-500">
+                  Written By:{" "}
+                  {blog.postAsAnonymous ? (
+                    <span className="inline-flex items-center gap-1">
+                      Anonymous
+                      <img
+                        src="/anonymous.png"
+                        alt="anonymous_img"
+                        className="h-4 inline-block"
+                      />
+                    </span>
+                  ) : (
+                    blog.user.name
+                  )}
+                </span>
+                <p className="mt-2 text-gray-700">
+                  {blog.experience.split(" ").slice(0, 20).join(" ")}...Read more
+                </p>
+              </div>
+            </Link>
+          ))
+        )}
       </div>
-    ))
-  )}
-</div>
-      
+
+      {/* Pagination */}
+      <div className="flex justify-center items-center gap-4 mt-6 text-sm sm:text-base">
+        {/* Prev Button */}
+        <button
+          onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+          disabled={page === 1}
+          className="disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <img src="/prevPage.png" alt="Previous" className="h-6 w-6" />
+        </button>
+
+        {/* Page Count */}
+        <span className="font-medium">
+          {page} / {totalPages}
+        </span>
+
+        {/* Next Button */}
+        <button
+          onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+          disabled={page === totalPages}
+          className="disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <img src="/nextPage.png" alt="Next" className="h-6 w-6" />
+        </button>
+      </div>
     </div>
   );
 }
+//implement blog opening functionality,
+// add selected/not selected
+//add login/signup/password reset routes
