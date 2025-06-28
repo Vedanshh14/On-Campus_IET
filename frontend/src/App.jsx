@@ -7,7 +7,7 @@ import PostBlog from "./pages/PostBlog";
 import Profile from "./pages/Profile";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
-import forgotPassword from "./pages/forgotPassword";
+import ForgotPassword from "./pages/forgotPassword";
 
 function App() {
   return (
@@ -18,7 +18,7 @@ function App() {
         <Route path="/blog/:id" element={<SingleBlog />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/forgotPassword" element={<forgotPassword />} />
+        <Route path="/forgotPassword" element={<ForgotPassword />} />
 
 
         {/* Protected Routes */}
