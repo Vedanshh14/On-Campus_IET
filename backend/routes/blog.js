@@ -35,7 +35,7 @@ router.get("/filter", async (req, res) => {
 
     // Full time Package Range Filtering
     //intern package not considered here.
-    //tell user to always enter in LPA .eg 6.25 LPA will also work
+   
 
     if (packageMin) {
       filter.packageFullTime = {
@@ -173,13 +173,29 @@ router.delete("/:id", protect, async (req, res) => {
 
     //Ans: Mongoose magic — blog.user is not a full user object unless you explicitly .populate() it
     //Without populate() blog.user is just the object_id of the user.
+    const company = blog.companyName;
 
     await blog.deleteOne();
 
-    // Optionally decrement blogsWritten count
+    //Removing the company from DB if no blog left for it
+
+    const updatedCompany = Company.findOneAndUpdate(
+      {name : company},
+      {$inc: {blogCount : -1}},
+      {new : true}// returns the updated document and not the old one
+    );
+    if(updatedCompany && updatedCompany.blogCount<=0){
+      Company.findOneAndDelete({CompanyName : company});
+    }
+
+    
+
+    //  decrement blogsWritten count for the user.
     await User.findByIdAndUpdate(req.user._id, {
       $inc: { blogsWritten: -1 },
     });
+
+
 
     res.status(200).json({ message: "Blog deleted successfully" });
   } catch (error) {

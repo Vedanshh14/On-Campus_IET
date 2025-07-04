@@ -1,8 +1,13 @@
 // src/pages/ForgotPassword.jsx
+import {useLocation} from "react-router-dom";
+
+
 export default function ForgotPassword() {
+  const location = useLocation();
+  const mail = location.state?.email.trim() ||  "<yourmail@example.com>";
   const defaultMessage = `Hello Team OnCampus,
 
-Please reset the password for my account associated with the email ID: yourmail@example.com
+Please reset the password for my account associated with the email ID: ${mail ? mail : "yourmail@example.com"}
 
 Thank you!`;
 

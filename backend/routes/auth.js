@@ -104,7 +104,7 @@ router.post('/login', async (req, res) => {
 
 
 //RESET PASSWORD AS ADMIN FOR SOMEONE FROM POSTMAN
-// POST /reset-password
+// POST /reset-pass-admin
 router.post('/reset-pass-admin', async (req, res) => {
   const { email, newPassword, password_reset_key} = req.body;
 

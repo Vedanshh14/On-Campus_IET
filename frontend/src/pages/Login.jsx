@@ -61,7 +61,8 @@ export default function Login() {
 </div>
 
 <span
-  onClick={() => navigate("/forgotPassword")}
+//learn how to pass props via navigate
+  onClick={() => navigate("/forgotPassword",{state : {email:formData.email || ""}})}
   className="text-blue-600 mt-1 block cursor-pointer hover:underline font-light text-sm"
 >
   Forgot Password?

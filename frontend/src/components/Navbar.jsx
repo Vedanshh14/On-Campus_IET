@@ -32,7 +32,7 @@ export default function Navbar() {
             alt="Write Blog Hover"
             className="h-6 hidden group-hover:block"
           />
-          <span className="hidden sm:inline text-gray-500 group-hover:text-black transition-colors duration-150">
+          <span className="hidden sm:inline font-light text-gray-500 group-hover:text-black transition-colors duration-150">
             Add your experience
           </span>
         </div>
