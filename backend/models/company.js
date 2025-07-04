@@ -6,6 +6,10 @@ const companySchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
+  },
+  blogCount: {
+    type: Number,
+    default:0
   }
 });
 

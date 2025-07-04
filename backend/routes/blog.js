@@ -6,7 +6,7 @@ const express = require("express");
 const Blog = require("../models/blog");
 const User = require("../models/user");
 const protect = require("../middleware/authMiddleware");
-// const Company = require('../models/company');
+const Company = require('../models/company');
 const mongoose = require("mongoose");
 
 const router = express.Router();
@@ -105,7 +105,9 @@ router.post("/add", protect, async (req, res) => {
     //this is destructuring , name must be exact saem as that in re.body
     //order can vary,this  copies values as it is in these variable
   } = req.body;
-
+   //we add a blog and increase the count in compnay model for that company.
+   //and decrease the count when a blog gets deleted
+   //so that when blog is deleted, if no blog left for that compnay we remove it from company model
   try {
     // Check if company already exists
     let existingCompany = await Company.findOne({ name: companyName });
@@ -136,6 +138,11 @@ router.post("/add", protect, async (req, res) => {
       $inc: { blogsWritten: 1 },
     });
 
+    await Company.findOneAndUpdate(
+  { name: companyName },
+  { $inc: { blogCount: 1 } }
+);
+
     res
       .status(201)
       .json({ message: "Blog posted successfully", blogId: blog._id });
@@ -153,6 +160,7 @@ router.delete("/:id", protect, async (req, res) => {
     if (!blog) {
       return res.status(404).json({ message: "Blog not found" });
     }
+    
 
     if (blog.user.toString() !== req.user._id.toString()) {
       return res
