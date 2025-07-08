@@ -1,6 +1,8 @@
-import { useParams } from "react-router-dom";
+import { useLocation,useParams,useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import upvoteIcon from "/upvote.svg";
+import upvotedIcon from "/upvoted.svg";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
@@ -8,6 +10,10 @@ export default function SingleBlog() {
   const { id } = useParams();
   const [blog, setBlog] = useState(null);
   const [showContact, setShowContact] = useState(false);
+  const [upvoted,setUpvoted] = useState(false);
+  const [upvotes,setUpvotes] = useState(0);
+  const navigate = useNavigate();
+  const location = useLocation();
   
   useEffect(() => {
     axios
@@ -15,12 +21,46 @@ export default function SingleBlog() {
       .then((res) => {
         setBlog(res.data.blog);
         //blog has (blog data+user info) both
+        setUpvotes(res.data.blog.upvotes.length);
+
+        const token = localStorage.getItem("token");
+        if(token){
+          const userId = JSON.parse(atob(token.split(".")[1])).id;
+          setUpvoted(res.data.blog.upvotes.includes(userId))
+        }
       })
       .catch((err) => {
         console.log("Error in fetching single blog: ", err);
       });
   }, [id]);
+
+ const handleUpvote = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    navigate("/signup", { state: { from: location } });
+    return;
+  }
+
+  try {
+    const res = await axios.post(
+      `${API_BASE}/api/blog/${id}/upvote`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setUpvotes(res.data.totalUpvotes);
+    setUpvoted(res.data.userHasUpvoted);
+  } catch (err) {
+    console.error("Upvote Error:", err);
+  }
+};
   if (!blog) return <div className="p-6">Loading...</div>;
+
+
 
   return (
     <div className="p-6 max-w-3xl mx-auto mt-6 mb-6 bg-white shadow rounded">
@@ -120,7 +160,19 @@ export default function SingleBlog() {
 
       <h3 className="text-gray-800 text-2xl">Experience :</h3>
          <br />
-      <p className="text-gray-800 whitespace-pre-wrap">{blog.experience}</p>
+      <p className="text-gray-800 font-light whitespace-pre-wrap">{blog.experience}</p>
+      <hr className="my-6 border-t border-gray-300" />
+
+<div className="flex items-center gap-1">
+  {/* <span className="font-thin text-gray-700">Upvote</span> */}
+  <img
+    src={upvoted ? upvotedIcon : upvoteIcon}
+    alt="Upvote"
+    className="h-4 w-4 cursor-pointer"
+    onClick={handleUpvote}
+  />
+  <span className="font-light text-gray-700">{upvotes} </span>
+</div>
     </div>
   );
 }

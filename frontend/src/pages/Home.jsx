@@ -27,17 +27,17 @@ export default function Home() {
         .filter(([_, value]) => value !== "")
         .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
         .join("&");
-      console.log("a");
+      // console.log("a");
 
       const res = await axios.get(
         `${API_BASE}/api/blog/filter?page=${page}&limit=${limit}&${query}`
       );
-      console.log("b");
+      // console.log("b");
       setBlogs(res.data.blogs);
       setTotalPages(res.data.totalPages);
     } catch (err) {
       console.error("Error fetching blogs:", err);
-      console.log("c");
+      // console.log("c");
     }
   };
 

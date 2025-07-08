@@ -99,7 +99,7 @@ router.get("/:id", async (req, res) => {
     //to get complete user data too in response, we use 'populate user'
     // -__v is the field auto added by mongoose to trach the version of the document
     if (!blog) return res.status(404).json({ message: "Blog not found" });
-    console.log(Blog);
+    // console.log(Blog);
     res.status(200).json({ message: "Blog fetched successfully", blog });
   } catch (err) {
     res.status(500).json({message: 'Server Error while fetching blog'});
