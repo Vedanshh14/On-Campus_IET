@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import FilterSection from "../components/FilterSection";
 import { Link } from "react-router-dom";
 import axios from "axios";
-
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 export default function Home() {
@@ -20,7 +19,7 @@ export default function Home() {
   const [blogs, setBlogs] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const limit = 15; // blogs per page,change to 15 later
+  const limit = 8; // blogs per page,change to 15 later
 
   const fetchBlogs = async () => {
     try {
@@ -28,17 +27,17 @@ export default function Home() {
         .filter(([_, value]) => value !== "")
         .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
         .join("&");
-        console.log('a');
+      console.log("a");
 
       const res = await axios.get(
         `${API_BASE}/api/blog/filter?page=${page}&limit=${limit}&${query}`
       );
-       console.log('b');
+      console.log("b");
       setBlogs(res.data.blogs);
       setTotalPages(res.data.totalPages);
     } catch (err) {
       console.error("Error fetching blogs:", err);
-       console.log('c');
+      console.log("c");
     }
   };
 
@@ -70,9 +69,7 @@ export default function Home() {
 
       <div className="mt-6 space-y-4">
         {blogs.length === 0 ? (
-          <p className="text-gray-500">
-            Sorry, no experience for applied filters.
-          </p>
+          <p className="text-gray-500">Sorry, no experience available.</p>
         ) : (
           blogs.map((blog) => (
             <Link to={`/blog/${blog._id}`} key={blog._id}>
@@ -81,16 +78,16 @@ export default function Home() {
                 className="border-b-zinc-600 rounded mt-6 p-4 shadow-sm bg-white"
               >
                 <h3 className="text-lg font-semibold">{blog.companyName}</h3>
-<p className="text-sm text-gray-500">
-  {blog.packageFullTime ? (
-    <span className="text-green-600">
-      {(blog.packageFullTime / 100000).toFixed(1)} LPA
-    </span>
-  ) : null}
-  {blog.packageFullTime && " • "}
-  {blog.campusType} •{" "}
-  {blog.arrivedInSem && `Sem ${blog.arrivedInSem}`}
-</p>
+                <p className="text-sm text-gray-500">
+                  {blog.packageFullTime ? (
+                    <span className="text-green-600">
+                      {(blog.packageFullTime / 100000).toFixed(1)} LPA
+                    </span>
+                  ) : null}
+                  {blog.packageFullTime && " • "}
+                  {blog.campusType} •{" "}
+                  {blog.arrivedInSem && `Sem ${blog.arrivedInSem}`}
+                </p>
                 <span className="text-sm text-gray-500">
                   Written By:{" "}
                   {blog.postAsAnonymous ? (
@@ -107,8 +104,14 @@ export default function Home() {
                   )}
                 </span>
                 <p className="mt-2 text-gray-700">
-                  {blog.experience.split(" ").slice(0, 20).join(" ")}...Read more
-                </p>
+  {blog.experience.split(" ").slice(0, 20).join(" ")}
+  <span className="text-blue-500">...Read more</span>
+</p>
+                <div className="flex items-center gap-1 text-sm text-gray-600 mt-2 cursor-text">
+                  {/* <span>Upvotes:</span> */}
+                  <img src="/upvoted.svg" alt="upvote icon" className="h-4 w-4" />
+                  <span className="">{blog.upvotes}</span>
+                </div>
               </div>
             </Link>
           ))

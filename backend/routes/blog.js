@@ -21,6 +21,7 @@ router.get("/filter", async (req, res) => {
       cgpaCriteria,
       selectionStatus,
       packageMin,
+      
     } = req.query;
 
     const filter = {};
@@ -46,8 +47,10 @@ router.get("/filter", async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
-    console.log("Incoming Query:", req.query);
-console.log("Constructed Filter:", filter);
+    // console.log("Incoming Query:", req.query);
+    // console.log("Constructed Filter:", filter);
+
+
 
     const blogs = await Blog.find(filter)
       .sort({ createdAt: -1 }) // newest first
@@ -55,15 +58,28 @@ console.log("Constructed Filter:", filter);
       .limit(parseInt(limit))
       .populate("user", "-password -__v");
     //every blog is populated with all users details who wrote it
-
+   
     const total = await Blog.countDocuments(filter);
+  
+  
+    const blogsWithUpvotes = blogs.map((blog)=>{
+          return{
+            ...blog.toObject(),//mongoose doc to object
+            upvotes: blog.upvotes.length,
+            //returning just the count of upvotes rather than
+            //full array to homepage, only count is required there
+            
+          }
+    })
+
+
 
     res.status(200).json({
       message: "Filtered blogs fetched successfully",
       currentPage: parseInt(page),
-      totalPages: Math.ceil(total / limit),
+      totalPages: Math.max(1, Math.ceil(total / limit)),
       totalBlogs: total,
-      blogs,
+      blogs: blogsWithUpvotes,
     });
   } catch (error) {
     console.error("Filter Fetch Error:", error.message, error.stack);

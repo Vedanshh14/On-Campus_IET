@@ -20,7 +20,7 @@ export default function SingleBlog() {
         console.log("Error in fetching single blog: ", err);
       });
   }, [id]);
-  if (!blog) return <div className="p-6">No blog with this id</div>;
+  if (!blog) return <div className="p-6">Loading...</div>;
 
   return (
     <div className="p-6 max-w-3xl mx-auto mt-6 mb-6 bg-white shadow rounded">

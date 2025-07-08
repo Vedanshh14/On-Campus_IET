@@ -8,6 +8,7 @@ import Profile from "./pages/Profile";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/forgotPassword";
+import Footer from "./components/Footer"
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
           }
         />
       </Routes>
+      <Footer/>
     </>
   );
 }
