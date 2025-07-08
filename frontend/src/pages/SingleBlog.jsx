@@ -23,7 +23,7 @@ export default function SingleBlog() {
   if (!blog) return <div className="p-6">No blog with this id</div>;
 
   return (
-    <div className="p-6 max-w-3xl mx-auto bg-white shadow rounded">
+    <div className="p-6 max-w-3xl mx-auto mt-5 mb-6 bg-white shadow rounded">
       <h1 className="text-3xl font-bold mb-2">
         {blog.companyName} ({blog.campusType})
       </h1>

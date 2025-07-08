@@ -2,10 +2,12 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
+
 const protect = async (req, res, next) => {
   try {
-    const token = req.cookies.token;
-
+    // const token = req.cookies.token;
+    const authHeader = req.headers.authorization;
+const token = authHeader && authHeader.split(" ")[1];
     if (!token) {
       return res.status(401).json({ message: 'Login first, No token found' });
     }

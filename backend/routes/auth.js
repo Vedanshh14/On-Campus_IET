@@ -50,12 +50,12 @@ router.post('/signup', async (req, res) => {
     const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
 
     // Set token in cookies
-    res.cookie('token', token, {
-      httpOnly: true,
-    
-    });
+    // res.cookie('token', token, {
+    //   httpOnly: true,
+    // });
+    // not sending token in cookie, sending it directly in response.
 
-    res.status(201).json({ message: 'User created successfully', userId: newUser._id });
+    res.status(201).json({ message: 'User created successfully', userId: newUser._id,token });
   } catch (error) {
     console.error('Signup Error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -76,25 +76,26 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid email or password' });
 
     // Check password
-    //  console.log('b');
+    
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
       return res.status(400).json({ message: 'Invalid email or password' });
 
     // Generate token
-    //  console.log('c');
+   
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
       
     });
-    //  console.log('d');
+   
     // Set cookie
-    res.cookie('token', token, {
-      httpOnly: true,
+    // res.cookie('token', token, {
+    //   httpOnly: true,
       
-    });
-    //  console.log('e');
+    // });
+     // not sending token in cookie, sending it directly in response.
+    
 
-    res.status(200).json({ message: 'Login successful' });
+    res.status(200).json({ message: 'Login successful' ,token});
   } catch (error) {
     console.error('Login Error:', error);
     res.status(500).json({ message: 'Server error' });

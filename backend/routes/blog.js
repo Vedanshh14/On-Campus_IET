@@ -46,6 +46,8 @@ router.get("/filter", async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
+    console.log("Incoming Query:", req.query);
+console.log("Constructed Filter:", filter);
 
     const blogs = await Blog.find(filter)
       .sort({ createdAt: -1 }) // newest first
@@ -64,7 +66,7 @@ router.get("/filter", async (req, res) => {
       blogs,
     });
   } catch (error) {
-    console.error("Filter Fetch Error:", error);
+    console.error("Filter Fetch Error:", error.message, error.stack);
     res.status(500).json({ message: "Server error while fetching blogs" });
   }
 });
@@ -179,13 +181,13 @@ router.delete("/:id", protect, async (req, res) => {
 
     //Removing the company from DB if no blog left for it
 
-    const updatedCompany = Company.findOneAndUpdate(
+    const updatedCompany = await Company.findOneAndUpdate(
       {name : company},
       {$inc: {blogCount : -1}},
       {new : true}// returns the updated document and not the old one
     );
     if(updatedCompany && updatedCompany.blogCount<=0){
-      Company.findOneAndDelete({CompanyName : company});
+      await Company.findOneAndDelete({CompanyName : company});
     }
 
     

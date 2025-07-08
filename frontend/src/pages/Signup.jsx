@@ -69,7 +69,7 @@ export default function Signup() {
     <div className="max-w-md mx-auto mt-8 mb-8 p-6 bg-white rounded shadow">
       <h2 className="text-2xl font-bold mb-4">Create an Account</h2>
       <p className="mb-4 font-light text-gray-600">Just few credentials:</p>
-      {message && <p className="mb-4 text-red-600">{message}</p>}
+      {message && <p className="mb-4 text-blue-500">{message}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Input fields */}
         <input

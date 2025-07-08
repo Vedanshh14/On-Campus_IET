@@ -20,7 +20,7 @@ export default function Home() {
   const [blogs, setBlogs] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const limit = 5; // blogs per page,change to 15 later
+  const limit = 15; // blogs per page,change to 15 later
 
   const fetchBlogs = async () => {
     try {
@@ -28,14 +28,17 @@ export default function Home() {
         .filter(([_, value]) => value !== "")
         .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
         .join("&");
+        console.log('a');
 
       const res = await axios.get(
         `${API_BASE}/api/blog/filter?page=${page}&limit=${limit}&${query}`
       );
+       console.log('b');
       setBlogs(res.data.blogs);
       setTotalPages(res.data.totalPages);
     } catch (err) {
       console.error("Error fetching blogs:", err);
+       console.log('c');
     }
   };
 
@@ -78,13 +81,16 @@ export default function Home() {
                 className="border-b-zinc-600 rounded mt-6 p-4 shadow-sm bg-white"
               >
                 <h3 className="text-lg font-semibold">{blog.companyName}</h3>
-                <p className="text-sm text-gray-500">
-                  <span className="text-green-600">
-                    {blog.packageFullTime / 100000} LPA
-                  </span>{" "}
-                  • {blog.campusType} •{" "}
-                  {blog.arrivedInSem && `Sem ${blog.arrivedInSem}`}
-                </p>
+<p className="text-sm text-gray-500">
+  {blog.packageFullTime ? (
+    <span className="text-green-600">
+      {(blog.packageFullTime / 100000).toFixed(1)} LPA
+    </span>
+  ) : null}
+  {blog.packageFullTime && " • "}
+  {blog.campusType} •{" "}
+  {blog.arrivedInSem && `Sem ${blog.arrivedInSem}`}
+</p>
                 <span className="text-sm text-gray-500">
                   Written By:{" "}
                   {blog.postAsAnonymous ? (
