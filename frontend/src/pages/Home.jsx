@@ -109,7 +109,7 @@ export default function Home() {
 </p>
                 <div className="flex items-center gap-1 text-sm text-gray-600 mt-2 cursor-text">
                   {/* <span>Upvotes:</span> */}
-                  <img src="/upvoted.svg" alt="upvote icon" className="h-4 w-4" />
+                  <img src="/upvote.svg" alt="upvote icon" className="h-4 w-4" />
                   <span className="">{blog.upvotes}</span>
                 </div>
               </div>

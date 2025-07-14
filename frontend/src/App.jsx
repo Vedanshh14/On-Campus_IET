@@ -9,6 +9,7 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/forgotPassword";
 import Footer from "./components/Footer"
+import EditProfile from "./pages/EditProfile";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgotPassword" element={<ForgotPassword />} />
+        <Route path="/editProfile" element={<EditProfile/>}/>
 
 
         {/* Protected Routes */}

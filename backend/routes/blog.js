@@ -1,7 +1,7 @@
 // routes/blog.js
 //order:
 //fetch by filters,fetch single blog by id,add,delete,upvote,update
-
+console.log("✅ blog.js loaded");
 const express = require("express");
 const Blog = require("../models/blog");
 const User = require("../models/user");
@@ -226,26 +226,41 @@ router.delete("/:id", protect, async (req, res) => {
 
 // POST /blog/:id/upvote
 // POST /api/blog/<blog_id>/upvote
+
+
 router.post("/:id/upvote", protect, async (req, res) => {
   try {
-    const blog = await Blog.findById(req.params.id);
-    //while testing i found incorrect blog id sends u to
-    //catch block(500) and doesnt return 404 of below line
+    console.log("⚡️ Upvote route hit!");
 
-    if (!blog) return res.status(404).json({ message: "Blog not found" });
-    //if u see in blog schema, upvote actualy is an array of userids
-    //which stores which user has upvoted a given block.
+    const blogId = req.params.id;
     const userId = req.user._id;
 
-    const alreadyUpvoted = blog.upvotes.includes(userId);
+    if (!mongoose.Types.ObjectId.isValid(blogId)) {
+     
+      return res.status(400).json({ message: "Invalid blog ID" });
+    }
+
+    const blog = await Blog.findById(blogId);
+
+    if (!blog) {
+  
+      return res.status(404).json({ message: "Blog not found" });
+    }
+
+    const alreadyUpvoted = blog.upvotes.some(
+      (id) => id.toString() === userId.toString()
+    );
 
     if (alreadyUpvoted) {
-      blog.upvotes.pull(userId); // remove upvote
+      blog.upvotes.pull(userId);
+      
     } else {
-      blog.upvotes.push(userId); // add upvote
+      blog.upvotes.push(userId);
+   
     }
 
     await blog.save();
+   
 
     res.status(200).json({
       message: alreadyUpvoted ? "Upvote removed" : "Upvoted successfully",
@@ -253,7 +268,7 @@ router.post("/:id/upvote", protect, async (req, res) => {
       userHasUpvoted: !alreadyUpvoted,
     });
   } catch (error) {
-    console.error("Upvote Error:", error);
+    console.error("❌ Upvote Error:", error.message);
     res.status(500).json({ message: "Server error while toggling upvote" });
   }
 });
@@ -312,5 +327,30 @@ router.put("/:id", protect, async (req, res) => {
     res.status(500).json({ message: "Server error while updating blog" });
   }
 });
+
+// api/blog/mine by user id for profile page 
+router.get("/mine",protect, async (req, res) => {
+  console.log("🔥 /mine route hit");
+  try {
+    console.log("User from protect middleware:", req.user); // 🕵️‍♂️ LOG this
+
+    const userId = req.user._id;
+    console.log("Fetching blogs for userId:", userId);
+
+    const blogs = await Blog.find({ user: userId }).sort({ createdAt: -1 });
+
+    res.status(200).json({
+      message: "Blogs by user fetched successfully",
+      blogs,
+    });
+  } catch (error) {
+    console.error("❌ Fetch User Blogs Error:", error.message);
+    console.error(error.stack); // ⛏️ Full trace
+    res.status(500).json({ message: "Server error while fetching user blogs" });
+  }
+});
+console.log("✅ /mine route is defined");
+
+
 
 module.exports = router;

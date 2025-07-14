@@ -14,26 +14,26 @@ const app = express();
 const cors = require('cors');
 app.use(cors()); // Allows ALL origins (wildcard *)
 
-// -------------------
-// 🔧 Middleware Setup
-// -------------------
+
+//  Middleware Setup
+
 app.use(express.json()); // To parse incoming JSON requests
 app.use(cookieParser()); // To handle JWT cookies
 
-// --------------------
-// 🔗 Database Connection
-// --------------------
+
+//  Database Connection
+
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ Connected to MongoDB'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// ----------------
-// 📁 Route Imports
-// ----------------
+
+//  Route Imports
+
 
 // Basic Health Check Route
 app.get('/', (req, res) => {
-  res.send('API is running...');
+  res.send('OnCampus server is running...');
 });
 
 //signup,login,password reset routes
@@ -46,6 +46,9 @@ app.use('/api/blog', blogRoutes);
 
 const companyRoutes = require('./routes/companies');
 app.use('/api/companies', companyRoutes)
+
+const userRoutes = require('./routes/user');
+app.use('/api/user',userRoutes);
 
 
 
