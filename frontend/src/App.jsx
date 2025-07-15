@@ -8,8 +8,9 @@ import Profile from "./pages/Profile";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/forgotPassword";
-import Footer from "./components/Footer"
+import Footer from "./components/Footer";
 import EditProfile from "./pages/EditProfile";
+import EditBlog from "./pages/EditBlog";
 
 function App() {
   return (
@@ -21,15 +22,32 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgotPassword" element={<ForgotPassword />} />
-        <Route path="/editProfile" element={<EditProfile/>}/>
-
 
         {/* Protected Routes */}
+
+        <Route
+          path="/editBlog/:id"
+          element={
+            <RequireAuth>
+              <EditBlog />
+            </RequireAuth>
+          }
+        />
+
         <Route
           path="/profile"
           element={
             <RequireAuth>
               <Profile />
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="/editProfile"
+          element={
+            <RequireAuth>
+              <EditProfile />
             </RequireAuth>
           }
         />
@@ -43,7 +61,7 @@ function App() {
           }
         />
       </Routes>
-      <Footer/>
+      <Footer />
     </>
   );
 }

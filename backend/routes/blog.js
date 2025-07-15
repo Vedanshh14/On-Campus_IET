@@ -87,25 +87,6 @@ router.get("/filter", async (req, res) => {
   }
 });
 
-//..............................................................
-
-//GET /blog/:id
-//getting a single blog by id
-router.get("/:id", async (req, res) => {
-  try {
-    const blog = await Blog.findById(req.params.id).populate('user','-password -__v');
-
-    //without .populate b v=bog data aajaega pr usme bs user id hi rhegi
-    //to get complete user data too in response, we use 'populate user'
-    // -__v is the field auto added by mongoose to trach the version of the document
-    if (!blog) return res.status(404).json({ message: "Blog not found" });
-    // console.log(Blog);
-    res.status(200).json({ message: "Blog fetched successfully", blog });
-  } catch (err) {
-    res.status(500).json({message: 'Server Error while fetching blog'});
-  }
-});
-
 //................................................................
 
 // POST /blog/add
@@ -230,7 +211,7 @@ router.delete("/:id", protect, async (req, res) => {
 
 router.post("/:id/upvote", protect, async (req, res) => {
   try {
-    console.log("⚡️ Upvote route hit!");
+   
 
     const blogId = req.params.id;
     const userId = req.user._id;
@@ -274,7 +255,7 @@ router.post("/:id/upvote", protect, async (req, res) => {
 });
 
 //..................................................
-//update route
+//Edit Blog
 // PUT /api/blog/:id
 //can do delete previous blog and create new with updated changes
 //but will loose upvote count
@@ -330,12 +311,12 @@ router.put("/:id", protect, async (req, res) => {
 
 // api/blog/mine by user id for profile page 
 router.get("/mine",protect, async (req, res) => {
-  console.log("🔥 /mine route hit");
+ 
   try {
-    console.log("User from protect middleware:", req.user); // 🕵️‍♂️ LOG this
+
 
     const userId = req.user._id;
-    console.log("Fetching blogs for userId:", userId);
+   
 
     const blogs = await Blog.find({ user: userId }).sort({ createdAt: -1 });
 
@@ -345,11 +326,30 @@ router.get("/mine",protect, async (req, res) => {
     });
   } catch (error) {
     console.error("❌ Fetch User Blogs Error:", error.message);
-    console.error(error.stack); // ⛏️ Full trace
+    console.error(error.stack); 
     res.status(500).json({ message: "Server error while fetching user blogs" });
   }
 });
-console.log("✅ /mine route is defined");
+
+//..............................................................
+
+//GET /blog/:id
+//getting a single blog by id
+router.get("/:id", async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id).populate('user','-password -__v');
+
+    //without .populate b v=bog data aajaega pr usme bs user id hi rhegi
+    //to get complete user data too in response, we use 'populate user'
+    // -__v is the field auto added by mongoose to trach the version of the document
+    if (!blog) return res.status(404).json({ message: "Blog not found" });
+    // console.log(Blog);
+    res.status(200).json({ message: "Blog fetched successfully", blog });
+  } catch (err) {
+    res.status(500).json({message: 'Server Error while fetching blog'});
+  }
+});
+
 
 
 

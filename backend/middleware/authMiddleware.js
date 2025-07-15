@@ -2,11 +2,12 @@
 //basically does authentication and populates the user in req by user details
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const express = require('express');
+const app = express();
 
 
 const protect = async (req, res, next) => {
-  console.log("✅ protect middleware ran");
-
+ 
   try {
     const authHeader = req.headers.authorization;
     const token = authHeader && authHeader.split(" ")[1];
@@ -19,13 +20,12 @@ const protect = async (req, res, next) => {
     const user = await User.findById(decoded.id).select("-password");
 
     if (!user) {
-      console.log("❌ No user found for decoded token");
+     
       return res.status(401).json({ message: "User no longer exists" });
     }
 
     req.user = user;
-    console.log("🔐 Authenticated user:", req.user.name);
-    console.log("➡️ Calling next()");
+
     next();
   } catch (error) {
     console.error("Auth Middleware Error:", error);

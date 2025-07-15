@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useState, useEffect } from "react";
+
+
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 export default function Profile() {
@@ -9,35 +11,34 @@ export default function Profile() {
   const [user, setUser] = useState(null);
   const [blogs, setBlogs] = useState([]);
 
- useEffect(() => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    setMessage("You are not logged in");
-    return;
-  }
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setMessage("You are not logged in");
+      return;
+    }
 
-  // ✅ Fetch profile first
-  axios
-    .get(`${API_BASE}/api/user/profile`, {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-    .then((res) => {
-      setUser(res.data.user);
-      // console.log("📡 Sending request to /api/blog/mine");
-      // ✅ Then fetch blogs written by this user using token (no need for ID)
-      return axios.get(`${API_BASE}/api/blog/mine`, {
+    // ✅ Fetch profile first
+    axios
+      .get(`${API_BASE}/api/user/profile`, {
         headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        setUser(res.data.user);
+
+        return axios.get(`${API_BASE}/api/blog/mine`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      })
+      .then((res) => {
+        setBlogs(res.data.blogs);
+      })
+      .catch((err) => {
+        console.log("catch block");
+        console.error("Error fetching profile or blogs:", err);
+        setMessage("Error loading profile or blogs");
       });
-    })
-    .then((res) => {
-  // console.log("✅ /mine response received:", res.data);
-  setBlogs(res.data.blogs);
-})
-    .catch((err) => {
-      console.error("Error fetching profile or blogs:", err);
-      setMessage("Error loading profile or blogs");
-    });
-}, []);
+  }, []);
   const handleLogout = () => {
     const confirmLogout = window.confirm("Are you sure you want to logout?");
     if (confirmLogout) {
@@ -52,6 +53,27 @@ export default function Profile() {
   const handleAdd = () => {
     navigate("/post");
   };
+  const handleDelete = (id) => {
+  const confirmDelete = window.confirm("Are you sure you want to delete this blog?");
+  if (!confirmDelete) return;
+
+  const token = localStorage.getItem("token");
+
+  axios
+    .delete(`${API_BASE}/api/blog/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    .then(() => {
+      
+      setBlogs((prevBlogs) => prevBlogs.filter((blog) => blog._id !== id));
+    })
+    .catch((err) => {
+      console.error("Could not delete blog:", err);
+    });
+};
+  const handleEdit = (id)=>{
+       navigate(`/editBlog/${id}`);
+  }
   if (message) return <div className="p-6 text-red-600">{message}</div>;
 
   if (!user) return <div className="p-6">Loading profile...</div>;
@@ -113,6 +135,67 @@ export default function Profile() {
           <img src="/plus.png" alt="Add" className="h-3 w-3" />
           Add
         </button>
+      </div>
+      <div className="mt-6 space-y-4">
+        {blogs.length === 0 ? (
+          <p className="text-gray-500">Sorry, no experience available.</p>
+        ) : (
+          blogs.map((blog) => (
+           
+              <div
+                key={blog._id}
+                className="border-b-zinc-600 rounded mt-6 p-4 shadow-sm bg-white"
+              >
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">{blog.companyName}</h3>
+                  <div className="ml-2 flex gap-[4px]">
+                    <button onClick={()=>handleEdit(blog._id)} className="p-1 cursor-pointer rounded-md hover:border hover:border-gray-300">
+                     
+                      <img
+                        className="h-4 w-4"
+                        src="/write-blog.png"
+                        alt="edit icon"
+                      />
+                    </button>
+                    <button onClick={()=>handleDelete(blog._id)} className="p-1 cursor-pointer rounded-md hover:border hover:border-gray-300">
+                      
+                      <img
+                        className="h-4 w-4"
+                        src="/delete.png"
+                        alt="delete icon"
+                      />
+                    </button>
+                  </div>
+                </div>
+
+                <p className="text-sm text-gray-500">
+                  {blog.packageFullTime ? (
+                    <span className="text-green-600">
+                      {(blog.packageFullTime / 100000).toFixed(1)} LPA
+                    </span>
+                  ) : null}
+                  {blog.packageFullTime && " • "}
+                  {blog.campusType} •{" "}
+                  {blog.arrivedInSem && `Sem ${blog.arrivedInSem}`}
+                </p>
+
+                <p className="mt-2 text-gray-700">
+                  {blog.experience.split(" ").slice(0, 20).join(" ")}
+                  <span className="text-blue-500">...Read more</span>
+                </p>
+                <div className="flex items-center gap-1 text-sm text-gray-600 mt-2 cursor-text">
+                  {/* <span>Upvotes:</span> */}
+                  <img
+                    src="/upvote.svg"
+                    alt="upvote icon"
+                    className="h-4 w-4"
+                  />
+                  <span className="">{blog.upvotes.length}</span>
+                </div>
+              </div>
+            
+          ))
+        )}
       </div>
     </div>
   );
