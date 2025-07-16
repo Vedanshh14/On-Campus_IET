@@ -14,6 +14,9 @@ export default function SingleBlog() {
   const [upvotes,setUpvotes] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
+
+
+ 
   
   useEffect(() => {
     axios
@@ -58,7 +61,7 @@ export default function SingleBlog() {
     console.error("Upvote Error:", err);
   }
 };
-  if (!blog) return <div className="p-6">Loading...</div>;
+  if (!blog) return (<div className="p-6">Loading...</div>);
 
 
 

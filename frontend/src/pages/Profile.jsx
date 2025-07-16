@@ -18,7 +18,7 @@ export default function Profile() {
       return;
     }
 
-    // ✅ Fetch profile first
+    //  Fetch profile first
     axios
       .get(`${API_BASE}/api/user/profile`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -76,7 +76,7 @@ export default function Profile() {
   }
   if (message) return <div className="p-6 text-red-600">{message}</div>;
 
-  if (!user) return <div className="p-6">Loading profile...</div>;
+  if (!user) return <div className="p-6">User not found</div>;
 
   return (
     <div className="p-6 max-w-3xl mt-5 mx-auto bg-white shadow rounded">
@@ -138,7 +138,7 @@ export default function Profile() {
       </div>
       <div className="mt-6 space-y-4">
         {blogs.length === 0 ? (
-          <p className="text-gray-500">Sorry, no experience available.</p>
+          <p className="text-gray-500 font-light">No experience posted yet.</p>
         ) : (
           blogs.map((blog) => (
            

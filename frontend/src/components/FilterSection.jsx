@@ -122,15 +122,35 @@ export default function FilterSection({ filters, setFilters, setPage, onApply })
         </select>
       </div>
 
-      {/* Apply Filters */}
-      <div className="col-span-full flex justify-end mt-4">
-        <button
-          onClick={handleApplyClick}
-          className="px-4 py-2 cursor-pointer bg-green-600 text-white rounded hover:bg-green-700 transition"
-        >
-          Apply Filters
-        </button>
-      </div>
+      
+     <div className="col-span-full flex justify-between items-center mt-4">
+  {/* Clear Filters Button */}
+  <button
+  onClick={() => {
+    setFilters({
+      companyName: "",
+      campusType: "",
+      arrivedInSem: "",
+      cgpaCriteria: "",
+      packageMin: "",   // key fix
+      selectionStatus: "",
+    });
+    setPage(1);
+    setTimeout(() => onApply(), 0); // ensures latest state used
+  }}
+  className="px-4 py-2 bg-gray-200 text-gray-800 cursor-pointer rounded hover:bg-gray-300 transition"
+>
+  Clear Filters
+</button>
+
+  {/* Apply Filters Button */}
+  <button
+    onClick={handleApplyClick}
+    className="px-4 py-2 cursor-pointer bg-green-600 text-white rounded hover:bg-green-700 transition"
+  >
+    Apply Filters
+  </button>
+</div>
     </div>
   );
 }

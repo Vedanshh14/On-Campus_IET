@@ -71,7 +71,7 @@ export default function EditProfile() {
   return (
     <div className="p-6 max-w-3xl mt-5 mx-auto bg-white shadow rounded">
       <h1 className="text-2xl font-bold mb-4">Edit Your Profile</h1>
-      {message && <p className="text-sm text-red-600 mb-2">{message}</p>}
+      {message && message=="Profile updated successfully!"?<p className="text-sm text-green-600 mb-2">{message}</p>:<p className="text-sm text-red-600 mb-2">{message}</p>}
 
       <div className="space-y-4">
         {/* Name */}

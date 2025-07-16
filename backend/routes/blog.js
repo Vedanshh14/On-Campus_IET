@@ -1,7 +1,7 @@
 // routes/blog.js
 //order:
 //fetch by filters,fetch single blog by id,add,delete,upvote,update
-console.log("✅ blog.js loaded");
+
 const express = require("express");
 const Blog = require("../models/blog");
 const User = require("../models/user");
@@ -150,6 +150,52 @@ router.post("/add", protect, async (req, res) => {
     res.status(500).json({ message: "Server error while posting blog" });
   }
 });
+
+// DELETE /api/blog/admin-delete
+router.delete("/admin-delete", async (req, res) => {
+  const { blogId, adminKey } = req.body;
+  const serverKey = process.env.DELETE_BLOG_KEY;
+
+  if (!adminKey || adminKey !== serverKey) {
+    return res.status(403).json({ message: "Forbidden: Invalid admin key" });
+  }
+
+  try {
+    const blog = await Blog.findById(blogId);
+
+    if (!blog) {
+      return res.status(404).json({ message: "Blog not found" });
+    }
+
+    const company = blog.companyName;
+    const userId = blog.user;
+
+    await blog.deleteOne();
+
+    //  Decrease blog count in Company
+    const updatedCompany = await Company.findOneAndUpdate(
+      { name: company },
+      { $inc: { blogCount: -1 } },
+      { new: true }
+    );
+
+    //  Remove company if no blogs remain
+    if (updatedCompany && updatedCompany.blogCount <= 0) {
+      await Company.findOneAndDelete({ name: company });
+    }
+
+    // Decrease blogsWritten for the user
+    await User.findByIdAndUpdate(userId, {
+      $inc: { blogsWritten: -1 },
+    });
+
+    res.status(200).json({ message: "Blog deleted by admin" });
+  } catch (error) {
+    console.error("❌ Admin Delete Error:", error);
+    res.status(500).json({ message: "Server error while deleting blog" });
+  }
+});
+//........................................................
 
 // DELETE /blog/:id
 router.delete("/:id", protect, async (req, res) => {
@@ -349,6 +395,13 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({message: 'Server Error while fetching blog'});
   }
 });
+
+
+//............................................................
+
+
+
+
 
 
 
