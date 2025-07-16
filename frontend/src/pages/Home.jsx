@@ -19,7 +19,7 @@ export default function Home() {
   const [blogs, setBlogs] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const limit = 2; // blogs per page,change to 15 later
+  const limit = 8; // blogs per page,change to 15 later
 
   const fetchBlogs = async () => {
     try {

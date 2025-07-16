@@ -230,7 +230,7 @@ router.delete("/:id", protect, async (req, res) => {
       {new : true}// returns the updated document and not the old one
     );
     if(updatedCompany && updatedCompany.blogCount<=0){
-      await Company.findOneAndDelete({CompanyName : company});
+      await Company.findOneAndDelete({ name: company });
     }
 
     

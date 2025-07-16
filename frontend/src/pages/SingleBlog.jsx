@@ -61,7 +61,7 @@ export default function SingleBlog() {
     console.error("Upvote Error:", err);
   }
 };
-  if (!blog) return (<div className="p-6">Loading...</div>);
+  if (!blog) return (<div className="p-6">Blog not found</div>);
 
 
 
