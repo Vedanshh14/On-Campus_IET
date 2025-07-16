@@ -4,7 +4,7 @@ import {useLocation} from "react-router-dom";
 
 export default function ForgotPassword() {
   const location = useLocation();
-  const mail = location.state?.email.trim() ||  "<yourmail@example.com>";
+  const mail = location.state?.email.trim() ||  "yourmail@example.com";
   const defaultMessage = `Hello Team OnCampus,
 
 Please reset the password for my account associated with the email ID: ${mail ? mail : "yourmail@example.com"}
@@ -12,7 +12,7 @@ Please reset the password for my account associated with the email ID: ${mail ? 
 Thank you!`;
 
   const encodedBody = encodeURIComponent(defaultMessage);
-  const mailtoLink = `mailto:vedanshupadhyay1401@gmail.com?subject=Password Reset Request - OnCampus&body=${encodedBody}`;
+  const mailtoLink = `mailto:on.campus.iet.davv@gmail.com?subject=Password Reset Request - OnCampus&body=${encodedBody}`;
 
   return (
     <div className="max-w-md mx-auto mt-10 bg-white p-6 shadow rounded text-gray-800">
@@ -25,7 +25,7 @@ Thank you!`;
       </p>
 
       <p className="f mb-2">📧 Recipient:</p>
-      <p className="mb-4 text-sm font-thin">vedanshupadhyay1401@gmail.com</p>
+      <p className="mb-4 text-sm font-thin">on.campus.iet.davv@gmail.com</p>
 
       <p className=" mb-2">📄 Message Preview:</p>
       <textarea
