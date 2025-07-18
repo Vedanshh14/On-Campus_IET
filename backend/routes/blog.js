@@ -25,14 +25,22 @@ router.get("/filter", async (req, res) => {
     } = req.query;
 
     const filter = {};
+    const orConditions = [];
+
 
     if (companyName) filter.companyName = companyName;
     if (campusType) filter.campusType = campusType;
     if (arrivedInSem) filter.arrivedInSem = Number(arrivedInSem);
-    if (cgpaCriteria) {
-      filter.cgpaCriteria = { $lte: Number(cgpaCriteria) };
-    }
     if (selectionStatus) filter.selectionStatus = selectionStatus;
+
+    //cgpa <=x or null , null too as many times it isnt known.
+    if (cgpaCriteria) {
+      filter.$or = [
+          {cgpaCriteria: {$lte: Number(cgpaCriteria)}},
+          {cgpaCriteria: null}
+      ];
+    }
+   
 
     // Full time Package Range Filtering
     //intern package not considered here.
@@ -40,7 +48,7 @@ router.get("/filter", async (req, res) => {
 
     if (packageMin) {
       filter.packageFullTime = {
-        $gte: Number(packageMin),
+        $gte: Number(packageMin)
       };
     }
 
@@ -53,7 +61,10 @@ router.get("/filter", async (req, res) => {
 
 
     const blogs = await Blog.find(filter)
-      .sort({ createdAt: -1 }) // newest first
+      .sort({ 
+        createdAt: -1
+
+       }) 
       .skip(skip)
       .limit(parseInt(limit))
       .populate("user", "-password -__v");

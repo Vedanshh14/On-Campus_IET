@@ -139,6 +139,11 @@ export default function SingleBlog() {
       Arrived in Semester: <span className="text-gray-700 font-medium">{blog.arrivedInSem}</span>
     </p>
   )}
+  {!blog.cgpaCriteria && (
+    <p>
+      CGPA Criteria: <span className="text-gray-700 font-medium">Not disclosed.</span>
+    </p>
+)}
   {blog.cgpaCriteria && (
     <p>
       CGPA Criteria: <span className="text-gray-700 font-medium">{blog.cgpaCriteria}</span>
