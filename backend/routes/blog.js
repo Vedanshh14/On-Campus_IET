@@ -131,7 +131,7 @@ router.post("/add", protect, async (req, res) => {
 const formattedCompanyName = toTitleCase(companyName.trim());
 
     // Check if company already exists
-    let existingCompany = await Company.findOne({ name: formattedCompanyName });
+    let existingCompany= await Company.findOne({ name: formattedCompanyName });
   
     // If not, add new company to DB
     if (!existingCompany) {
