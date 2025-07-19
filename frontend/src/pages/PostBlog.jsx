@@ -6,6 +6,7 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 export default function PostBlog() {
   const [companies, setCompanies] = useState([]);
+  
 
   const [selectedCompany, setSelectedCompany] = useState("");
   const [newCompany, setNewCompany] = useState("");
@@ -42,7 +43,7 @@ export default function PostBlog() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     const selectedName =
       selectedCompany === "Other" ? newCompany.trim() : selectedCompany;
 
@@ -200,6 +201,7 @@ export default function PostBlog() {
           <input
             type="number"
             name="packageIntern"
+            min="0"
             value={formData.packageIntern}
             onChange={handleInput}
             onWheel={(e) => e.target.blur()}
@@ -212,6 +214,7 @@ export default function PostBlog() {
           <input
             type="number"
             name="packageFullTime"
+            min="0"
             value={formData.packageFullTime}
             onChange={handleInput}
             onWheel={(e) => e.target.blur()}

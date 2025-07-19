@@ -119,19 +119,30 @@ router.post("/add", protect, async (req, res) => {
    //and decrease the count when a blog gets deleted
    //so that when blog is deleted, if no blog left for that compnay we remove it from company model
   try {
-    // Check if company already exists
-    let existingCompany = await Company.findOne({ name: companyName });
 
+    function toTitleCase(str) {
+  return str
+    .toLowerCase()
+    .split(" ")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
+const formattedCompanyName = toTitleCase(companyName.trim());
+
+    // Check if company already exists
+    let existingCompany = await Company.findOne({ name: formattedCompanyName });
+  
     // If not, add new company to DB
     if (!existingCompany) {
-      existingCompany = new Company({ name: companyName });
+      existingCompany = new Company({ name: formattedCompanyName });
       await existingCompany.save();
     }
 
     const blog = new Blog({
       user: req.user._id,
       postAsAnonymous,
-      companyName,
+      companyName: formattedCompanyName,
       campusType,
       arrivedInSem,
       cgpaCriteria,
@@ -140,8 +151,10 @@ router.post("/add", protect, async (req, res) => {
       selectionStatus,
       experience,
     });
+// console.log('a');
 
     await blog.save();
+    // console.log('b');
 
     // Increment blogsWritten for the user
     await User.findByIdAndUpdate(req.user._id, {
@@ -149,7 +162,7 @@ router.post("/add", protect, async (req, res) => {
     });
 
     await Company.findOneAndUpdate(
-  { name: companyName },
+  { name: formattedCompanyName },
   { $inc: { blogCount: 1 } }
 );
 

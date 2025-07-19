@@ -1,49 +1,100 @@
 /* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react";
 import FilterSection from "../components/FilterSection";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 export default function Home() {
   const [showFilters, setShowFilters] = useState(false);
-  const [filters, setFilters] = useState({
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const [blogs, setBlogs] = useState([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorType, setErrorType] = useState(null);
+
+  const page = Number(searchParams.get("page")) || 1;
+  const limit = 8;
+
+  // UI-only draft filters
+  const [filterDraft, setFilterDraft] = useState({
     companyName: "",
     campusType: "",
     arrivedInSem: "",
     cgpaCriteria: "",
     packageMin: "",
-    selectionStatus: "",
+    selectionStatus: ""
   });
 
-  const [blogs, setBlogs] = useState([]);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const limit = 8; // blogs per page,change to 15 later
+  //  On URL change  update filters + fetch blogs
+  useEffect(() => {
+    const urlFilters = {
+      companyName: searchParams.get("companyName") || "",
+      campusType: searchParams.get("campusType") || "",
+      arrivedInSem: searchParams.get("arrivedInSem") || "",
+      cgpaCriteria: searchParams.get("cgpaCriteria") || "",
+      packageMin: searchParams.get("packageMin") || "",
+      selectionStatus: searchParams.get("selectionStatus") || ""
+    };
 
-  const fetchBlogs = async () => {
+    setFilterDraft(urlFilters); // Sync filter UI with URL
+
+    fetchBlogs(urlFilters, page);
+  }, [searchParams]);
+
+  // ✅ Fetch blogs with filters
+  const fetchBlogs = async (filters, pageNum) => {
     try {
+      setIsLoading(true);
+      setErrorType(null);
+
       const query = Object.entries(filters)
         .filter(([_, value]) => value !== "")
         .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
         .join("&");
-      // console.log("a");
 
       const res = await axios.get(
-        `${API_BASE}/api/blog/filter?page=${page}&limit=${limit}&${query}`
+        `${API_BASE}/api/blog/filter?page=${pageNum}&limit=${limit}&${query}`
       );
-      // console.log("b");
+
       setBlogs(res.data.blogs);
       setTotalPages(res.data.totalPages);
     } catch (err) {
-      console.error("Error fetching blogs:", err);
-      // console.log("c");
+      if (!window.navigator.onLine) {
+        setErrorType("network");
+      } else {
+        setErrorType("server");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchBlogs();
-  }, [page]);
+  //  Apply filters (updates URL, which triggers useEffect)
+  const applyFilters = () => {
+    const newParams = new URLSearchParams();
+
+    Object.entries(filterDraft).forEach(([key, value]) => {
+      if (value !== "") newParams.set(key, value);
+    });
+
+    newParams.set("page", 1);
+    setSearchParams(newParams); // triggers blog fetch
+  };
+
+  //  Clear filters
+  const clearFilters = () => {
+    setSearchParams({ page: 1 });
+  };
+
+  //  Pagination
+  const goToPage = (newPage) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", newPage);
+    setSearchParams(params); // triggers blog fetch
+  };
 
   return (
     <div className="px-4 py-4">
@@ -58,25 +109,36 @@ export default function Home() {
       {/* Conditionally Render Filters */}
       {showFilters && (
         <FilterSection
-          filters={filters}
-          setFilters={setFilters}
-          setPage={setPage}
-          onApply={fetchBlogs}
+          filters={filterDraft}
+          onChange={(key, value) =>
+            setFilterDraft((prev) => ({ ...prev, [key]: value }))
+          }
+          onApply={applyFilters}
+          onClear={clearFilters}
         />
       )}
 
       {/* Blog List */}
-
       <div className="mt-6 space-y-4">
-        {blogs.length === 0 ? (
-          <p className="text-gray-500">Sorry, no experience available.</p>
+        {isLoading ? (
+          <p className="text-gray-500">Loading blogs...</p>
+        ) : errorType === "network" ? (
+          <p className="text-red-500">
+            No internet connection. Please check your network.
+          </p>
+        ) : errorType === "server" ? (
+          <p className="text-red-500">
+            Server is down or unavailable. Kindly reach us out at{" "}
+            on.campus.iet.davv@gmail.com
+          </p>
+        ) : blogs.length === 0 ? (
+          <p className="text-gray-500">
+            No experiences found matching your filters.
+          </p>
         ) : (
           blogs.map((blog) => (
             <Link to={`/blog/${blog._id}`} key={blog._id}>
-              <div
-                key={blog._id}
-                className="border-b-zinc-600 rounded mt-6 p-4 shadow-sm bg-white"
-              >
+              <div className="border-b-zinc-600 rounded mt-6 p-4 shadow-sm bg-white">
                 <h3 className="text-lg font-semibold">{blog.companyName}</h3>
                 <p className="text-sm text-gray-500">
                   {blog.packageFullTime ? (
@@ -104,13 +166,16 @@ export default function Home() {
                   )}
                 </span>
                 <p className="mt-2 text-gray-700">
-  {blog.experience.split(" ").slice(0, 20).join(" ")}
-  <span className="text-blue-500">...Read more</span>
-</p>
+                  {blog.experience.split(" ").slice(0, 20).join(" ")}
+                  <span className="text-blue-500">...Read more</span>
+                </p>
                 <div className="flex items-center gap-1 text-sm text-gray-600 mt-2 cursor-text">
-                  {/* <span>Upvotes:</span> */}
-                  <img src="/upvote.svg" alt="upvote icon" className="h-4 w-4" />
-                  <span className="">{blog.upvotes}</span>
+                  <img
+                    src="/upvote.svg"
+                    alt="upvote icon"
+                    className="h-4 w-4"
+                  />
+                  <span>{blog.upvotes}</span>
                 </div>
               </div>
             </Link>
@@ -120,23 +185,20 @@ export default function Home() {
 
       {/* Pagination */}
       <div className="flex justify-center items-center gap-4 mt-6 text-sm sm:text-base">
-        {/* Prev Button */}
         <button
-          onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+          onClick={() => goToPage(Math.max(1, page - 1))}
           disabled={page === 1}
           className="disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <img src="/prevPage.png" alt="Previous" className="h-6 w-6" />
         </button>
 
-        {/* Page Count */}
         <span className="font-medium">
           {page} / {totalPages}
         </span>
 
-        {/* Next Button */}
         <button
-          onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+          onClick={() => goToPage(Math.min(totalPages, page + 1))}
           disabled={page === totalPages}
           className="disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -146,6 +208,3 @@ export default function Home() {
     </div>
   );
 }
-//implement blog opening functionality,
-// add selected/not selected
-//add login/signup/password reset routes

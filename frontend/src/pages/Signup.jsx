@@ -21,6 +21,7 @@ export default function Signup() {
   const location = useLocation();
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || "/";
+  
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -29,6 +30,7 @@ export default function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+     
       if (formData.password.length < 8) {
         setMessage("Password must be at least 8 characters long");
         return;
@@ -37,9 +39,7 @@ export default function Signup() {
         setMessage("Only valid Gmail addresses are allowed.");
         return;
       }
-      if (
-        formData.linkedin &&
-        !/^https:\/\/(www\.)?linkedin\.com\/in\/[A-Za-z0-9_-]+\/?$/.test(
+      if (formData.linkedin &&!/^https:\/\/(www\.)?linkedin\.com\/in\/[A-Za-z0-9_-]+\/?$/.test(
           formData.linkedin
         )
       ) {
@@ -53,7 +53,7 @@ export default function Signup() {
       const token = res.data.token;
       localStorage.setItem("token", token);
 
-      setMessage("Signup successful");
+      setMessage("Signup successful!");
 
       // ✅ Redirect after 1.5 seconds
       setTimeout(() => {
@@ -110,13 +110,15 @@ export default function Signup() {
           ))}
         </select>
 
-        <input
-          type="text"
-          name="linkedin"
-          placeholder="LinkedIn ID"
-          className="w-full border p-2 rounded"
-          onChange={handleChange}
-        />
+       <input
+  type="text"
+  name="linkedin"
+  placeholder="LinkedIn Profile URL"
+  className="w-full border p-2 rounded"
+  onChange={handleChange}
+  value={formData.linkedin}
+  
+/>
 
         <input
           type="email"

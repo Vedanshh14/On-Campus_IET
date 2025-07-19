@@ -5,7 +5,6 @@ import axios from "axios";
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
 export default function EditProfile() {
-
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -18,6 +17,8 @@ export default function EditProfile() {
   });
 
   const [message, setMessage] = useState("");
+
+  const linkedInRegex = /^https:\/\/(www\.)?linkedin\.com\/in\/[a-zA-Z0-9-_]+\/?$/;
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -54,14 +55,18 @@ export default function EditProfile() {
   const handleSave = async () => {
     const token = localStorage.getItem("token");
     try {
+      if (formData.linkedin && !linkedInRegex.test(formData.linkedin.trim())) {
+  alert("Please enter a valid LinkedIn URL hurr like https://www.linkedin.com/in/your-id");
+  return; // stop submission
+}
       await axios.put(`${API_BASE}/api/user/profile`, formData, {
-  headers: { Authorization: `Bearer ${token}` },
-});
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setMessage("Profile updated successfully!");
 
       setTimeout(() => {
-      navigate("/profile");
-    }, 1000);
+        navigate("/profile");
+      }, 1000);
     } catch (err) {
       console.error("Update error:", err);
       setMessage("Failed to update profile.");
@@ -71,7 +76,11 @@ export default function EditProfile() {
   return (
     <div className="p-6 max-w-3xl mt-5 mx-auto bg-white shadow rounded">
       <h1 className="text-2xl font-bold mb-4">Edit Your Profile</h1>
-      {message && message=="Profile updated successfully!"?<p className="text-sm text-green-600 mb-2">{message}</p>:<p className="text-sm text-red-600 mb-2">{message}</p>}
+      {message && message == "Profile updated successfully!" ? (
+        <p className="text-sm text-green-600 mb-2">{message}</p>
+      ) : (
+        <p className="text-sm text-red-600 mb-2">{message}</p>
+      )}
 
       <div className="space-y-4">
         {/* Name */}
@@ -84,13 +93,13 @@ export default function EditProfile() {
         />
 
         {/* Email */}
-   <input
-  type="email"
-  name="email"
-  value={formData.email}
-  onChange={handleChange}
-  className="w-full border p-2 rounded"
-/>
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleChange}
+          className="w-full border p-2 rounded"
+        />
         {/* Branch */}
         <select
           name="branch"
@@ -100,7 +109,9 @@ export default function EditProfile() {
         >
           <option value="">Select Branch</option>
           {["CSE", "CSBS", "IT", "ETC", "EI", "Mech", "Civil"].map((b) => (
-            <option key={b} value={b}>{b}</option>
+            <option key={b} value={b}>
+              {b}
+            </option>
           ))}
         </select>
 
@@ -113,7 +124,9 @@ export default function EditProfile() {
         >
           <option value="">Select Batch</option>
           {Array.from({ length: 15 }, (_, i) => 2015 + i).map((year) => (
-            <option key={year} value={year}>{year}</option>
+            <option key={year} value={year}>
+              {year}
+            </option>
           ))}
         </select>
 
@@ -122,12 +135,15 @@ export default function EditProfile() {
           type="text"
           name="linkedin"
           value={formData.linkedin}
-          placeholder={formData.linkedin ? "LinkedIn URL" : "You didn’t provide it yet"}
+          placeholder={
+            formData.linkedin
+              ? `LinkedIn: ${formData.linkedin}`
+              : "LinkedIn URL: You didn’t provide it yet"
+          }
           onChange={handleChange}
           className="w-full border p-2 rounded"
+          
         />
-
-        
 
         {/* Save Changes */}
         <button
@@ -137,7 +153,6 @@ export default function EditProfile() {
           Save Changes
         </button>
       </div>
-     
     </div>
   );
 }

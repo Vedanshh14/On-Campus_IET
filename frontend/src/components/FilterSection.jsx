@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
-export default function FilterSection({ filters, setFilters, setPage, onApply }) {
+export default function FilterSection({ filters, onChange, onApply, onClear }) {
   const [companies, setCompanies] = useState([]);
 
   useEffect(() => {
@@ -16,11 +16,6 @@ export default function FilterSection({ filters, setFilters, setPage, onApply })
       });
   }, []);
 
-  const handleApplyClick = () => {
-    setPage(1); // Reset to first page
-    onApply();  // Trigger blog fetch with current filters
-  };
-
   return (
     <div className="p-4 grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 bg-white rounded shadow">
       {/* Company Filter */}
@@ -28,7 +23,7 @@ export default function FilterSection({ filters, setFilters, setPage, onApply })
         <label className="block mb-1 font-medium">Company:</label>
         <select
           value={filters.companyName}
-          onChange={(e) => setFilters((prev) => ({ ...prev, companyName: e.target.value }))}
+          onChange={(e) => onChange("companyName", e.target.value)}
           className="w-full p-2 border border-gray-300 rounded"
         >
           <option value="">All</option>
@@ -45,7 +40,7 @@ export default function FilterSection({ filters, setFilters, setPage, onApply })
         <label className="block mb-1 font-medium">Campus Type:</label>
         <select
           value={filters.campusType}
-          onChange={(e) => setFilters((prev) => ({ ...prev, campusType: e.target.value }))}
+          onChange={(e) => onChange("campusType", e.target.value)}
           className="w-full p-2 border border-gray-300 rounded"
         >
           <option value="">Both</option>
@@ -59,7 +54,7 @@ export default function FilterSection({ filters, setFilters, setPage, onApply })
         <label className="block mb-1 font-medium">Semester:</label>
         <select
           value={filters.arrivedInSem}
-          onChange={(e) => setFilters((prev) => ({ ...prev, arrivedInSem: e.target.value }))}
+          onChange={(e) => onChange("arrivedInSem", e.target.value)}
           className="w-full p-2 border border-gray-300 rounded"
         >
           <option value="">Any</option>
@@ -76,7 +71,7 @@ export default function FilterSection({ filters, setFilters, setPage, onApply })
         <label className="block mb-1 font-medium">CGPA Criteria:</label>
         <select
           value={filters.cgpaCriteria}
-          onChange={(e) => setFilters((prev) => ({ ...prev, cgpaCriteria: e.target.value }))}
+          onChange={(e) => onChange("cgpaCriteria", e.target.value)}
           className="w-full p-2 border border-gray-300 rounded"
         >
           <option value="">Any</option>
@@ -92,11 +87,8 @@ export default function FilterSection({ filters, setFilters, setPage, onApply })
       <div>
         <label className="block mb-1 font-medium">Min Package (LPA):</label>
         <select
-          value={filters.packageFullTimeMin}
-          onChange={(e) => setFilters((prev) => ({
-            ...prev,
-            packageMin: e.target.value
-          }))}
+          value={filters.packageMin}
+          onChange={(e) => onChange("packageMin", e.target.value)}
           className="w-full p-2 border border-gray-300 rounded"
         >
           <option value="">Any</option>
@@ -113,7 +105,7 @@ export default function FilterSection({ filters, setFilters, setPage, onApply })
         <label className="block mb-1 font-medium">Selection Status:</label>
         <select
           value={filters.selectionStatus}
-          onChange={(e) => setFilters((prev) => ({ ...prev, selectionStatus: e.target.value }))}
+          onChange={(e) => onChange("selectionStatus", e.target.value)}
           className="w-full p-2 border border-gray-300 rounded"
         >
           <option value="">Any</option>
@@ -122,35 +114,24 @@ export default function FilterSection({ filters, setFilters, setPage, onApply })
         </select>
       </div>
 
-      
-     <div className="col-span-full flex justify-between items-center mt-4">
-  {/* Clear Filters Button */}
-  <button
-  onClick={() => {
-    setFilters({
-      companyName: "",
-      campusType: "",
-      arrivedInSem: "",
-      cgpaCriteria: "",
-      packageMin: "",   // key fix
-      selectionStatus: "",
-    });
-    setPage(1);
-    setTimeout(() => onApply(), 0); // ensures latest state used
-  }}
-  className="px-4 py-2 bg-gray-200 text-gray-800 cursor-pointer rounded hover:bg-gray-300 transition"
->
-  Clear Filters
-</button>
+      {/* Buttons */}
+      <div className="col-span-full flex justify-between items-center mt-4">
+        {/* Clear Filters */}
+        <button
+          onClick={onClear}
+          className="px-4 py-2 bg-gray-200 text-gray-800 cursor-pointer rounded hover:bg-gray-300 transition"
+        >
+          Clear Filters
+        </button>
 
-  {/* Apply Filters Button */}
-  <button
-    onClick={handleApplyClick}
-    className="px-4 py-2 cursor-pointer bg-green-600 text-white rounded hover:bg-green-700 transition"
-  >
-    Apply Filters
-  </button>
-</div>
+        {/* Apply Filters */}
+        <button
+          onClick={onApply}
+          className="px-4 py-2 cursor-pointer bg-green-600 text-white rounded hover:bg-green-700 transition"
+        >
+          Apply Filters
+        </button>
+      </div>
     </div>
   );
 }
