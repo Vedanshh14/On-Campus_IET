@@ -19,7 +19,11 @@ export default function FilterSection({ filters, onChange, onApply, onClear }) {
   return (
     <div className="p-4 grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 bg-white rounded shadow">
       {/* Company Filter */}
+
+     
+
       <div>This is main branch</div>
+
       <div>
         <label className="block mb-1 font-medium">Company:</label>
         <select
@@ -132,6 +136,7 @@ export default function FilterSection({ filters, onChange, onApply, onClear }) {
         >
           Apply Filters
         </button>
+         <div>This is dev branch</div>
       </div>
     </div>
   );
