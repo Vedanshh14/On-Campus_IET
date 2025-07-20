@@ -120,15 +120,9 @@ router.post("/add", protect, async (req, res) => {
    //so that when blog is deleted, if no blog left for that compnay we remove it from company model
   try {
 
-    function toTitleCase(str) {
-  return str
-    .toLowerCase()
-    .split(" ")
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
+ 
 
-const formattedCompanyName = toTitleCase(companyName.trim());
+const formattedCompanyName = companyName.trim().toUpperCase();
 
     // Check if company already exists
     let existingCompany= await Company.findOne({ name: formattedCompanyName });

@@ -139,7 +139,7 @@ export default function Home() {
           blogs.map((blog) => (
             <Link to={`/blog/${blog._id}`} key={blog._id}>
               <div className="border-b-zinc-600 rounded mt-6 p-4 shadow-sm bg-white">
-                <h3 className="text-lg font-semibold">{blog.companyName}</h3>
+                <h3 className="text-lg ">{blog.companyName}</h3>
                 <p className="text-sm text-gray-500">
                   {blog.packageFullTime ? (
                     <span className="text-green-600">
