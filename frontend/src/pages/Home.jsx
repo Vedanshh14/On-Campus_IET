@@ -188,7 +188,7 @@ export default function Home() {
         <button
           onClick={() => goToPage(Math.max(1, page - 1))}
           disabled={page === 1}
-          className="disabled:opacity-50 disabled:cursor-not-allowed"
+          className="disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
         >
           <img src="/prevPage.png" alt="Previous" className="h-6 w-6" />
         </button>
@@ -200,7 +200,7 @@ export default function Home() {
         <button
           onClick={() => goToPage(Math.min(totalPages, page + 1))}
           disabled={page === totalPages}
-          className="disabled:opacity-50 disabled:cursor-not-allowed"
+          className="disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
         >
           <img src="/nextPage.png" alt="Next" className="h-6 w-6" />
         </button>
